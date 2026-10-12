@@ -1,5 +1,7 @@
 # HoneyGuard
 
+[![CI](https://github.com/midnightat/HoneyGuard/actions/workflows/ci.yml/badge.svg)](https://github.com/midnightat/HoneyGuard/actions/workflows/ci.yml)
+
 **Human Error Protection for Email** — an experimental Chrome extension built with Manifest V3, React, TypeScript, and Vite.
 
 HoneyGuard is intended to help people spot phishing, lookalike domains, and risky links before acting on email. This repository contains the v0.1.0-alpha extension skeleton; it is not a security product yet.
@@ -35,7 +37,7 @@ The planned checks should run locally where possible. Email content should not b
 Clone the repository, then install dependencies:
 
 ```sh
-git clone https://github.com/YOUR-USERNAME/HoneyGuard.git
+git clone https://github.com/midnightat/HoneyGuard.git
 cd HoneyGuard
 npm install
 ```
@@ -78,3 +80,9 @@ dist/                 Generated extension; load this directory in Chrome
 ```
 
 HoneyGuard is an early local MVP. Gmail integration, email analysis, a backend, accounts, and payments are outside the scope of this version.
+
+## License
+
+HoneyGuard is licensed under the GNU General Public License v3.0. See [LICENSE](LICENSE).
+
+Third-party dependencies remain under their respective licenses.
