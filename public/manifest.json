@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "HoneyGuard",
+  "version": "0.1.0",
+  "description": "Локальная основа для защиты от ошибок при работе с электронной почтой.",
+  "action": {
+    "default_title": "HoneyGuard",
+    "default_popup": "index.html"
+  }
+}
