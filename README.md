@@ -12,20 +12,59 @@ HoneyGuard is intended to help people spot phishing, lookalike domains, and risk
 
 - A Manifest V3 extension with a simple HoneyGuard popup.
 - The popup displays “Extension running” and notes that protection is not configured. This is a UI status only; it does not mean that any security checks are active.
-- A TypeScript contract for future detection modules.
+- A local Domain Detection Engine API for analyzing hostnames against a small reference list. It is not connected to the popup, Gmail, senders, or message links.
+- A local Chrome test harness for manually checking browser URL/IDNA behavior against the same cases used by Node.js tests.
 - A local Vite build, with no host permissions, email access, or network communication requested by the extension.
 
 ## Planned features
 
 These features are not implemented:
 
-- Lookalike-domain and Unicode homograph detection.
 - Email sender analysis in Gmail.
 - Inspection of the real destinations behind links in email.
 - User-managed trusted contacts and domains.
 - Clear, explainable warnings about suspicious messages.
 
-The planned checks should run locally where possible. Email content should not be sent to external servers.
+The domain engine is a standalone library only; it does not inspect actual email or protect the extension popup. The planned checks should run locally where possible. Email content should not be sent to external servers.
+
+## Domain Detection Engine
+
+The current engine is an early, limited hostname analyzer. It is not a complete phishing detector:
+
+```ts
+import { analyzeHostname } from './src/detection/domain';
+
+const result = analyzeHostname('rnicrosoft.com');
+```
+
+The API accepts a hostname only, not a URL or email address. Results are a discriminated union:
+
+- `success` includes `suspicion: none | low | medium | high`, normalized hostname, suffix classification, and explainable findings.
+- `invalid` and `unsupported` include a machine-readable `reasonCode` and never have a `suspicion` field.
+
+`none` means that this limited engine found no known signal; it does **not** mean the domain is safe. Even `high` is not a confirmed phishing verdict and never blocks a domain.
+`low` is reserved for weak heuristics, `medium` for one strong mechanism, and `high` requires at least two independent strong mechanisms. Multiple algorithms that identify one spoofed label share a mechanism and evidence group and count once.
+
+### Scope and limitations
+
+- Built-in reference domains are only `microsoft.com` and `paypal.com`. Future/custom references can be passed as `trustedDomains`; they do not disable other checks.
+- Hostnames use the runtime WHATWG `URL` implementation for IDNA conversion, `punycode` for checked U-label decoding, and `tldts` with ICANN and PRIVATE PSL data. Results can vary with the browser's URL/IDNA version.
+- `.test` is the only special-use suffix analyzed in v0.2, using a clearly marked comparison boundary. Other recognized special-use domains return `unsupported`; unknown suffixes are also `unsupported`, and neither category is suspicious by itself.
+- Unicode lookalike mapping is deliberately limited to Latin, Cyrillic, and Greek source characters with Unicode UTS #39 `MA` mappings. This is **not** a UTS #39 skeleton implementation: it does not implement full script resolution, bidi processing, or every Unicode script. Other scripts return `unsupported` rather than an implicit safe result.
+- The fixed source snapshot is Unicode 18.0.0 `confusables.txt` from [Unicode security data](https://www.unicode.org/Public/security/latest/confusables.txt), SHA-256 `6ed3ee967c9dfdf6677d563c9985182fbc50a2efb7d6059cd57b2e2ce18f5b92`. The full source is kept under `data/unicode/18.0.0/`; the generated table has 674 mappings (258 multi-code-point outputs, 11,986 bytes raw / about 3.5 KB gzip). If the analyzer is bundled, only this limited table is imported, not the original source. Unicode attribution and source terms are included with the data.
+- The domain engine is not yet imported by the popup or another runtime extension page, so it currently adds **0 bytes** to the production popup bundle. A separate minified browser bundle of the analyzer and its runtime dependencies measures about 150 KB raw / 54 KB gzip; integration in a later stage should account for that size.
+- Similarity is evidence, not proof. The bounded edit-distance signal is weak; correlated methods for one spoofed label share an evidence group. The engine can miss unknown brands or more complex tricks and can flag a legitimate domain that resembles a built-in reference.
+- Checks run locally. The analyzer makes no network requests and does not read or send email.
+
+### Local Chrome URL / IDNA harness
+
+The browser harness checks WHATWG `URL` hostname conversion with the same shared fixture file used by the Vitest suite. It makes no external requests and does not access email:
+
+1. Open `chrome://extensions` and enable **Developer mode**.
+2. Choose **Load unpacked** and select `tools/domain-test-harness`.
+3. Open the **HoneyGuard Domain Test Harness** popup and review the PASS/FAIL results.
+
+The harness exercises Chrome's URL/IDNA behavior only. Browser behavior is not automatically tested in CI, and this manual check does not replace the Node.js engine tests.
 
 ## Requirements
 
@@ -74,7 +113,10 @@ npm run build
 ```text
 public/manifest.json  Chrome Extension Manifest V3
 src/popup/            Popup UI and its test
-src/detection/        Types for future detection modules
+src/detection/domain/ Standalone hostname parsing and detection engine
+data/unicode/         Pinned official Unicode confusables source
+scripts/              Offline Unicode table generator
+tools/domain-test-harness/ Local Chrome WHATWG URL/IDNA harness
 src/main.tsx          Popup entry point
 dist/                 Generated extension; load this directory in Chrome
 ```

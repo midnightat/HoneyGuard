@@ -1,0 +1,9 @@
+{
+  "unicodeVersion": "18.0.0",
+  "sourceUrl": "https://www.unicode.org/Public/security/latest/confusables.txt",
+  "sha256": "6ed3ee967c9dfdf6677d563c9985182fbc50a2efb7d6059cd57b2e2ce18f5b92",
+  "sourceBytes": 763128,
+  "mappingStatus": "MA",
+  "includedScripts": ["Latin", "Cyrillic", "Greek"],
+  "attribution": "Copyright © 2026 Unicode, Inc. The Unicode data is provided under the Unicode Terms of Use: https://www.unicode.org/terms_of_use.html"
+}

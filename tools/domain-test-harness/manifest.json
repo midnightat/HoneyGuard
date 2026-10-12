@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "HoneyGuard Domain Test Harness",
+  "version": "0.1.0",
+  "description": "Local manual checks for browser URL and IDNA behavior.",
+  "action": {
+    "default_title": "Domain test harness",
+    "default_popup": "index.html"
+  }
+}
