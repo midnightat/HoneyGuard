@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HoneyGuard domain test harness</title>
+    <style>
+      body {
+        color: #152238;
+        font: 14px/1.5 system-ui, sans-serif;
+        margin: 24px;
+        max-width: 1000px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th,
+      td {
+        border: 1px solid #ccd4df;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      code {
+        overflow-wrap: anywhere;
+      }
+
+      .pass {
+        color: #176b3a;
+      }
+
+      .fail,
+      #status[role="alert"] {
+        color: #a32222;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>HoneyGuard browser URL / IDNA checks</h1>
+      <p>
+        These local checks exercise Chrome's WHATWG URL hostname conversion. They
+        do not inspect email, use network services, or certify a hostname as safe.
+      </p>
+      <p id="status" role="status">Running shared fixtures…</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Case</th>
+            <th>Input</th>
+            <th>Expected URL hostname</th>
+            <th>Chrome URL hostname</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody id="results"></tbody>
+      </table>
+    </main>
+    <script src="./harness.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,366 @@
+{
+  "cases": [
+    {
+      "id": "microsoft",
+      "input": "microsoft.com",
+      "expectedWhatwgHostname": "microsoft.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "microsoft.com",
+        "registrableDomain": "microsoft.com",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "microsoft-subdomain",
+      "input": "login.microsoft.com",
+      "expectedWhatwgHostname": "login.microsoft.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "login.microsoft.com",
+        "registrableDomain": "microsoft.com",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "rn-instead-of-m",
+      "input": "rnicrosoft.com",
+      "expectedWhatwgHostname": "rnicrosoft.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "medium",
+        "normalizedHostname": "rnicrosoft.com",
+        "registrableDomain": "rnicrosoft.com",
+        "suffixType": "icann",
+        "findingKinds": ["ascii_replacement"]
+      }
+    },
+    {
+      "id": "one-instead-of-l",
+      "input": "paypa1.com",
+      "expectedWhatwgHostname": "paypa1.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "medium",
+        "normalizedHostname": "paypa1.com",
+        "registrableDomain": "paypa1.com",
+        "suffixType": "icann",
+        "findingKinds": ["ascii_replacement"]
+      }
+    },
+    {
+      "id": "brand-in-test-subdomain",
+      "input": "microsoft.com.evil.test",
+      "expectedWhatwgHostname": "microsoft.com.evil.test",
+      "expected": {
+        "status": "success",
+        "suspicion": "medium",
+        "normalizedHostname": "microsoft.com.evil.test",
+        "comparisonDomain": "evil.test",
+        "suffixType": "special-use",
+        "findingKinds": ["brand_in_subdomain"]
+      }
+    },
+    {
+      "id": "same-brand-two-independent-signals",
+      "input": "paypal.paypa1.test",
+      "expectedWhatwgHostname": "paypal.paypa1.test",
+      "expected": {
+        "status": "success",
+        "suspicion": "high",
+        "normalizedHostname": "paypal.paypa1.test",
+        "comparisonDomain": "paypa1.test",
+        "suffixType": "special-use",
+        "findingKinds": ["ascii_replacement", "brand_in_subdomain"]
+      }
+    },
+    {
+      "id": "multiple-brands-same-subdomain-mechanism",
+      "input": "paypal.microsoft.evil.test",
+      "expectedWhatwgHostname": "paypal.microsoft.evil.test",
+      "expected": {
+        "status": "success",
+        "suspicion": "medium",
+        "normalizedHostname": "paypal.microsoft.evil.test",
+        "comparisonDomain": "evil.test",
+        "suffixType": "special-use",
+        "findingKinds": ["brand_in_subdomain", "brand_in_subdomain"]
+      }
+    },
+    {
+      "id": "cyrillic-paypal-confusable",
+      "input": "раураl.com",
+      "expectedWhatwgHostname": "xn--l-7sba6dbr.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "medium",
+        "normalizedHostname": "xn--l-7sba6dbr.com",
+        "registrableDomain": "xn--l-7sba6dbr.com",
+        "suffixType": "icann",
+        "findingKinds": ["unicode_confusable", "mixed_script"]
+      }
+    },
+    {
+      "id": "legitimate-unicode-idn",
+      "input": "bücher.de",
+      "expectedWhatwgHostname": "xn--bcher-kva.de",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "xn--bcher-kva.de",
+        "registrableDomain": "xn--bcher-kva.de",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "legitimate-punycode-idn",
+      "input": "xn--bcher-kva.de",
+      "expectedWhatwgHostname": "xn--bcher-kva.de",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "xn--bcher-kva.de",
+        "registrableDomain": "xn--bcher-kva.de",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "private-psl-domain",
+      "input": "tenant.github.io",
+      "expectedWhatwgHostname": "tenant.github.io",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "tenant.github.io",
+        "registrableDomain": "tenant.github.io",
+        "suffixType": "private",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "co-uk-registrable-domain",
+      "input": "login.example.co.uk",
+      "expectedWhatwgHostname": "login.example.co.uk",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "login.example.co.uk",
+        "registrableDomain": "example.co.uk",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "github-io-suffix-only",
+      "input": "github.io",
+      "expectedWhatwgHostname": "github.io",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "suffix_only"
+      }
+    },
+    {
+      "id": "co-uk-suffix-only",
+      "input": "co.uk",
+      "expectedWhatwgHostname": "co.uk",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "suffix_only"
+      }
+    },
+    {
+      "id": "trailing-dot",
+      "input": "microsoft.com.",
+      "expectedWhatwgHostname": "microsoft.com.",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "microsoft.com",
+        "registrableDomain": "microsoft.com",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "mixed-idna-separator",
+      "input": "microsoft。com",
+      "expectedWhatwgHostname": "microsoft.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "microsoft.com",
+        "registrableDomain": "microsoft.com",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "unknown-suffix-partial-finding",
+      "input": "rnicrosoft.unknownxyz",
+      "expectedWhatwgHostname": "rnicrosoft.unknownxyz",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "unknown_suffix",
+        "findingKinds": ["ascii_replacement"]
+      }
+    },
+    {
+      "id": "unknown-suffix-not-a-signal",
+      "input": "example.unknownxyz",
+      "expectedWhatwgHostname": "example.unknownxyz",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "unknown_suffix",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "unrelated-longer-domain",
+      "input": "microsofthosting.com",
+      "expectedWhatwgHostname": "microsofthosting.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "microsofthosting.com",
+        "registrableDomain": "microsofthosting.com",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "one-edit-close-domain",
+      "input": "microsofts.com",
+      "expectedWhatwgHostname": "microsofts.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "low",
+        "normalizedHostname": "microsofts.com",
+        "registrableDomain": "microsofts.com",
+        "suffixType": "icann",
+        "findingKinds": ["edit_distance"]
+      }
+    },
+    {
+      "id": "mixed-script-without-brand-match",
+      "input": "cоntent.com",
+      "expectedWhatwgHostname": "xn--cntent-wqf.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "low",
+        "normalizedHostname": "xn--cntent-wqf.com",
+        "registrableDomain": "xn--cntent-wqf.com",
+        "suffixType": "icann",
+        "findingKinds": ["mixed_script"]
+      }
+    },
+    {
+      "id": "unknown-brand-is-not-guessed",
+      "input": "goog1e.com",
+      "expectedWhatwgHostname": "goog1e.com",
+      "expected": {
+        "status": "success",
+        "suspicion": "none",
+        "normalizedHostname": "goog1e.com",
+        "registrableDomain": "goog1e.com",
+        "suffixType": "icann",
+        "findingKinds": []
+      }
+    },
+    {
+      "id": "empty-input",
+      "input": "",
+      "expectedWhatwgHostname": null,
+      "expected": {
+        "status": "invalid",
+        "reasonCode": "empty_input"
+      }
+    },
+    {
+      "id": "full-url-rejected",
+      "input": "https://microsoft.com/path",
+      "expectedWhatwgHostname": "https",
+      "expected": {
+        "status": "invalid",
+        "reasonCode": "not_hostname"
+      }
+    },
+    {
+      "id": "email-rejected",
+      "input": "user@microsoft.com",
+      "expectedWhatwgHostname": "microsoft.com",
+      "expected": {
+        "status": "invalid",
+        "reasonCode": "not_hostname"
+      }
+    },
+    {
+      "id": "credentials-rejected",
+      "input": "user:pass@microsoft.com",
+      "expectedWhatwgHostname": "microsoft.com",
+      "expected": {
+        "status": "invalid",
+        "reasonCode": "not_hostname"
+      }
+    },
+    {
+      "id": "port-rejected",
+      "input": "microsoft.com:443",
+      "expectedWhatwgHostname": "microsoft.com",
+      "expected": {
+        "status": "invalid",
+        "reasonCode": "not_hostname"
+      }
+    },
+    {
+      "id": "malformed-punycode",
+      "input": "xn--.com",
+      "expectedWhatwgHostname": "xn--.com",
+      "expected": {
+        "status": "invalid",
+        "reasonCode": "invalid_idna"
+      }
+    },
+    {
+      "id": "ipv4-unsupported",
+      "input": "127.0.0.1",
+      "expectedWhatwgHostname": "127.0.0.1",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "ip_literal"
+      }
+    },
+    {
+      "id": "ipv6-unsupported",
+      "input": "[::1]",
+      "expectedWhatwgHostname": "[::1]",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "ip_literal"
+      }
+    },
+    {
+      "id": "localhost-unsupported",
+      "input": "localhost",
+      "expectedWhatwgHostname": "localhost",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "local_hostname"
+      }
+    },
+    {
+      "id": "unsupported-arabic-script",
+      "input": "مثال.com",
+      "expectedWhatwgHostname": "xn--mgbh0fb.com",
+      "expected": {
+        "status": "unsupported",
+        "reasonCode": "unsupported_script"
+      }
+    }
+  ]
+}
