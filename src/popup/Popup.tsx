@@ -54,6 +54,17 @@ function getResultStatusLabel(result: DomainAnalysisResult): string {
   }
 }
 
+function getResultAnnouncement(result: DomainAnalysisResult): string {
+  switch (result.status) {
+    case 'success':
+      return `Проверка завершена. ${suspicionPresentation[result.suspicion].label}.`;
+    case 'invalid':
+      return `Некорректный ввод. ${result.explanation}`;
+    case 'unsupported':
+      return `Анализ не поддерживается. ${result.explanation}`;
+  }
+}
+
 function Findings({ result }: { readonly result: DomainAnalysisResult }) {
   if (result.status === 'invalid' || result.findings.length === 0) {
     return null;
@@ -83,7 +94,6 @@ function AnalysisResult({ result }: { readonly result: DomainAnalysisResult }) {
 
   return (
     <section
-      aria-live="polite"
       aria-labelledby="result-title"
       className={`popup__result popup__result--${result.status}`}
     >
@@ -181,10 +191,14 @@ export function Popup() {
         </button>
       </form>
 
+      <p aria-atomic="true" aria-live="polite" className="popup__sr-only" role="status">
+        {result ? getResultAnnouncement(result) : ''}
+      </p>
+
       {result ? (
         <AnalysisResult result={result} />
       ) : (
-        <p className="popup__idle" role="status">
+        <p className="popup__idle">
           Введите hostname и нажмите «Проверить». Результат появится здесь.
         </p>
       )}

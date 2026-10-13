@@ -24,8 +24,52 @@ describe('Popup', () => {
     expect(screen.getByRole('heading', { name: 'HoneyGuard' })).toBeTruthy();
     expect(screen.getByRole('textbox', { name: 'Доменное имя (hostname)' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Проверить' })).toBeTruthy();
-    expect(screen.getByRole('status').textContent).toContain('Введите hostname');
+    expect(screen.getByRole('status').textContent).toBe('');
+    expect(screen.getByText(/Введите hostname и нажмите/u)).toBeTruthy();
     expect(screen.queryByRole('heading', { name: 'Результат проверки' })).toBeNull();
+  });
+
+  it('keeps a single live region mounted and updates it for each result status', () => {
+    render(<Popup />);
+    const liveRegion = screen.getByRole('status');
+
+    expect(liveRegion.getAttribute('aria-live')).toBe('polite');
+    expect(liveRegion.getAttribute('aria-atomic')).toBe('true');
+    expect(liveRegion.textContent).toBe('');
+
+    submitHostname('microsoft.com');
+    expect(screen.getByRole('status')).toBe(liveRegion);
+    expect(liveRegion.textContent).toBe(
+      'Проверка завершена. Нет выявленных признаков.',
+    );
+
+    submitHostname('https://paypal.com');
+    expect(screen.getByRole('status')).toBe(liveRegion);
+    expect(liveRegion.textContent).toBe(
+      'Некорректный ввод. Ожидался только hostname, не URL, email, порт или credentials.',
+    );
+
+    submitHostname('127.0.0.1');
+    expect(screen.getByRole('status')).toBe(liveRegion);
+    expect(liveRegion.textContent).toBe(
+      'Анализ не поддерживается. IP-адреса не входят в область анализа доменных имён.',
+    );
+  });
+
+  it('announces the success summary without repeating all findings', () => {
+    render(<Popup />);
+    submitHostname('rnicrosoft.com');
+
+    expect(screen.getByRole('status').textContent).toBe(
+      'Проверка завершена. Средняя подозрительность.',
+    );
+    expect(screen.getByText('Замена похожих символов')).toBeTruthy();
+    expect(screen.getByRole('status').textContent).not.toContain(
+      'Замена похожих символов',
+    );
+    expect(
+      screen.getByRole('heading', { name: 'Результат проверки' }).parentElement?.getAttribute('aria-live'),
+    ).toBeNull();
   });
 
   it.each([
@@ -143,7 +187,8 @@ describe('Popup', () => {
     });
 
     expect(screen.queryByRole('heading', { name: 'Результат проверки' })).toBeNull();
-    expect(screen.getByRole('status').textContent).toContain('Введите hostname');
+    expect(screen.getByText(/Введите hostname и нажмите/u)).toBeTruthy();
+    expect(screen.getByRole('status').textContent).toBe('');
   });
 
   it('keeps form controls outside the findings scrolling container', () => {
