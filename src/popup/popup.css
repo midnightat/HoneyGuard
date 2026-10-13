@@ -1,7 +1,17 @@
 .popup {
-  width: 340px;
-  padding: 24px;
-  background: #fff;
+  --popup-bg: #0d1723;
+  --popup-surface: #142231;
+  --popup-border: #2a3b4e;
+  --popup-text: #edf4f8;
+  --popup-muted: #a4b5c4;
+  --popup-accent: #50d3a0;
+
+  width: 380px;
+  max-width: 100%;
+  padding: 14px;
+  background: var(--popup-bg);
+  color: var(--popup-text);
+  color-scheme: dark;
 }
 
 .popup__header {
@@ -14,42 +24,203 @@
   display: grid;
   width: 38px;
   height: 38px;
+  flex: 0 0 auto;
   place-items: center;
   border-radius: 12px;
-  background: #eaf5f0;
-  color: #16734d;
+  background: #17382f;
+  color: var(--popup-accent);
   font-size: 20px;
   font-weight: 750;
 }
 
 .popup__title {
   margin: 0;
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 700;
   letter-spacing: -0.025em;
 }
 
-.popup__status {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin-top: 24px;
-  color: #16734d;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.popup__status-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #27a36b;
-  box-shadow: 0 0 0 3px #e6f5ed;
+.popup__subtitle {
+  margin: 2px 0 0;
+  color: var(--popup-muted);
+  font-size: 12px;
 }
 
 .popup__note {
-  margin: 10px 0 0;
-  color: #637087;
+  margin: 12px 0;
+  color: var(--popup-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.popup__form {
+  display: grid;
+  gap: 7px;
+}
+
+.popup__label {
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.popup__input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--popup-border);
+  border-radius: 9px;
+  padding: 9px 10px;
+  background: #09111b;
+  color: var(--popup-text);
+  font: inherit;
   font-size: 13px;
+}
+
+.popup__input::placeholder {
+  color: #74889a;
+}
+
+.popup__input:focus-visible,
+.popup__submit:focus-visible {
+  outline: 2px solid var(--popup-accent);
+  outline-offset: 2px;
+}
+
+.popup__submit {
+  min-height: 36px;
+  border: 0;
+  border-radius: 9px;
+  padding: 8px 14px;
+  background: var(--popup-accent);
+  color: #071a14;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.popup__submit:hover {
+  background: #70e2b5;
+}
+
+.popup__idle,
+.popup__result {
+  margin: 12px 0 0;
+  border: 1px solid var(--popup-border);
+  border-radius: 11px;
+  padding: 11px;
+  background: var(--popup-surface);
+  font-size: 12px;
   line-height: 1.5;
+}
+
+.popup__idle {
+  color: var(--popup-muted);
+}
+
+.popup__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.popup__section-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.popup__result-status {
+  margin: 6px 0 0;
+  color: var(--popup-muted);
+  font-weight: 650;
+}
+
+.popup__normalized {
+  display: grid;
+  gap: 3px;
+  margin: 8px 0 0;
+  color: var(--popup-muted);
+  font-size: 11px;
+}
+
+.popup__normalized code {
+  color: var(--popup-text);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.popup__risk {
+  margin-top: 10px;
+  border-left: 3px solid var(--popup-accent);
+  padding: 7px 9px;
+  background: #0d1c24;
+}
+
+.popup__risk p,
+.popup__result-explanation {
+  margin: 4px 0 0;
+  color: var(--popup-muted);
+}
+
+.popup__risk--low {
+  border-color: #e5bd56;
+}
+
+.popup__risk--medium {
+  border-color: #f29c52;
+}
+
+.popup__risk--high {
+  border-color: #f06b72;
+}
+
+.popup__result--invalid {
+  border-color: #6b5060;
+}
+
+.popup__result--unsupported {
+  border-color: #5c6176;
+}
+
+.popup__findings {
+  margin-top: 10px;
+}
+
+.popup__finding-list {
+  display: grid;
+  gap: 7px;
+  max-height: 120px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  scrollbar-color: #516579 var(--popup-surface);
+  scrollbar-width: thin;
+}
+
+.popup__finding-list:focus-visible {
+  outline: 2px solid var(--popup-accent);
+  outline-offset: 2px;
+}
+
+.popup__finding {
+  border-top: 1px solid var(--popup-border);
+  padding-top: 8px;
+}
+
+.popup__finding strong {
+  font-size: 12px;
+}
+
+.popup__finding p {
+  margin: 4px 0 0;
+  color: var(--popup-muted);
+  overflow-wrap: anywhere;
 }

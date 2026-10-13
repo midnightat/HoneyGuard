@@ -4,6 +4,7 @@ export type SuffixType = 'icann' | 'private' | 'special-use' | 'unknown';
 
 export type DomainReasonCode =
   | 'empty_input'
+  | 'input_too_long'
   | 'not_hostname'
   | 'invalid_hostname'
   | 'invalid_idna'
@@ -57,7 +58,12 @@ export interface InvalidDomainAnalysis {
   readonly input: string;
   readonly reasonCode: Extract<
     DomainReasonCode,
-    'empty_input' | 'not_hostname' | 'invalid_hostname' | 'invalid_idna' | 'invalid_trusted_domain'
+    | 'empty_input'
+    | 'input_too_long'
+    | 'not_hostname'
+    | 'invalid_hostname'
+    | 'invalid_idna'
+    | 'invalid_trusted_domain'
   >;
   readonly explanation: string;
 }
