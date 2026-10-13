@@ -1,6 +1,10 @@
 import { decode, encode } from 'punycode/';
 import type { DomainReasonCode } from './types';
 
+export const MAX_HOSTNAME_INPUT_LENGTH = 1024;
+export const HOSTNAME_INPUT_TOO_LONG_EXPLANATION =
+  `Ввод слишком длинный: допустимо не более ${MAX_HOSTNAME_INPUT_LENGTH} кодовых единиц UTF-16 до IDNA-нормализации.`;
+
 export type HostnameNormalization =
   | {
       readonly status: 'success';
@@ -11,7 +15,11 @@ export type HostnameNormalization =
       readonly status: 'invalid';
       readonly reasonCode: Extract<
         DomainReasonCode,
-        'empty_input' | 'not_hostname' | 'invalid_hostname' | 'invalid_idna'
+        | 'empty_input'
+        | 'input_too_long'
+        | 'not_hostname'
+        | 'invalid_hostname'
+        | 'invalid_idna'
       >;
     }
   | {
@@ -54,7 +62,15 @@ function decodeHostname(normalizedHostname: string): string | null {
 }
 
 export function normalizeHostname(input: string): HostnameNormalization {
-  if (input.length === 0 || input.trim().length === 0) {
+  if (input.length === 0) {
+    return { status: 'invalid', reasonCode: 'empty_input' };
+  }
+
+  if (input.length > MAX_HOSTNAME_INPUT_LENGTH) {
+    return { status: 'invalid', reasonCode: 'input_too_long' };
+  }
+
+  if (input.trim().length === 0) {
     return { status: 'invalid', reasonCode: 'empty_input' };
   }
 

@@ -10,7 +10,7 @@
     "dev": "vite",
     "build": "npm run verify:confusables && tsc --noEmit && vite build",
     "generate:confusables": "node scripts/generate-confusables.mjs",
-    "test": "vitest run",
+    "test": "node scripts/verify-popup-layout.mjs && vitest run",
     "typecheck": "tsc --noEmit",
     "verify:confusables": "node scripts/generate-confusables.mjs --check",
     "verify:windows-eol": "node scripts/verify-windows-eol.mjs"
@@ -22,10 +22,12 @@
     "tldts": "7.4.18"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.3",
     "@types/punycode": "2.1.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^26.1.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.0",
     "vitest": "^4.1.11"

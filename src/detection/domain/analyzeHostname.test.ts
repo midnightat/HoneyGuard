@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import sharedVectors from '../../../tools/domain-test-harness/cases.json';
 import { analyzeHostname } from './analyzeHostname';
 import { applyAsciiReplacements, hasSingleEditDistance } from './asciiLookalikes';
-import { normalizeHostname } from './normalizeHostname';
+import {
+  MAX_HOSTNAME_INPUT_LENGTH,
+  normalizeHostname,
+} from './normalizeHostname';
 import { parseDomain } from './parseDomain';
 import { classifySuspicion } from './riskPolicy';
 import { toConfusableKey } from './unicodeConfusables';
@@ -69,6 +72,44 @@ describe('analyzeHostname shared cases', () => {
 });
 
 describe('hostname parsing and detection boundaries', () => {
+  it.each([
+    ['ASCII', 'a'.repeat(MAX_HOSTNAME_INPUT_LENGTH)],
+    ['Unicode', 'ü'.repeat(MAX_HOSTNAME_INPUT_LENGTH)],
+    ['supplementary Unicode', '😀'.repeat(MAX_HOSTNAME_INPUT_LENGTH / 2)],
+  ])('allows the preliminary input limit for %s before canonical hostname validation', (_, input) => {
+    expect(input).toHaveLength(MAX_HOSTNAME_INPUT_LENGTH);
+    expect(analyzeHostname(input)).toMatchObject({
+      status: 'invalid',
+      reasonCode: 'invalid_hostname',
+    });
+  });
+
+  it.each([
+    ['ASCII', 'a'.repeat(MAX_HOSTNAME_INPUT_LENGTH + 1)],
+    ['Unicode', 'ü'.repeat(MAX_HOSTNAME_INPUT_LENGTH + 1)],
+    ['supplementary Unicode', '😀'.repeat(MAX_HOSTNAME_INPUT_LENGTH / 2 + 1)],
+  ])('rejects over-limit %s input before hostname normalization', (_, input) => {
+    expect(analyzeHostname(input)).toMatchObject({
+      status: 'invalid',
+      reasonCode: 'input_too_long',
+    });
+    expect(normalizeHostname(input)).toMatchObject({
+      status: 'invalid',
+      reasonCode: 'input_too_long',
+    });
+  });
+
+  it('checks the input limit before parsing optional trusted domains', () => {
+    expect(
+      analyzeHostname('a'.repeat(MAX_HOSTNAME_INPUT_LENGTH + 1), {
+        trustedDomains: ['not/a/hostname'],
+      }),
+    ).toMatchObject({
+      status: 'invalid',
+      reasonCode: 'input_too_long',
+    });
+  });
+
   it('normalizes case and one terminal dot', () => {
     expect(normalizeHostname('Microsoft.COM.')).toMatchObject({
       status: 'success',

@@ -2,7 +2,11 @@ import {
   applyAsciiReplacements,
   hasSingleEditDistance,
 } from './asciiLookalikes';
-import { normalizeHostname } from './normalizeHostname';
+import {
+  HOSTNAME_INPUT_TOO_LONG_EXPLANATION,
+  MAX_HOSTNAME_INPUT_LENGTH,
+  normalizeHostname,
+} from './normalizeHostname';
 import { parseDomain } from './parseDomain';
 import { classifySuspicion } from './riskPolicy';
 import { BUILT_IN_TRUSTED_DOMAINS, type TrustedDomain } from './trustedDomains';
@@ -193,10 +197,23 @@ function invalidResult(
   return { status: 'invalid', input, reasonCode, explanation };
 }
 
+function inputTooLongResult(input: string): DomainAnalysisResult {
+  return {
+    status: 'invalid',
+    input,
+    reasonCode: 'input_too_long',
+    explanation: HOSTNAME_INPUT_TOO_LONG_EXPLANATION,
+  };
+}
+
 export function analyzeHostname(
   hostname: string,
   options: AnalyzeHostnameOptions = {},
 ): DomainAnalysisResult {
+  if (hostname.length > MAX_HOSTNAME_INPUT_LENGTH) {
+    return inputTooLongResult(hostname);
+  }
+
   let userTrustedDomains: readonly TrustedDomain[];
   try {
     userTrustedDomains = parseTrustedDomains(options.trustedDomains);
@@ -210,6 +227,7 @@ export function analyzeHostname(
   if (normalized.status === 'invalid') {
     const explanations = {
       empty_input: 'Hostname не может быть пустым.',
+      input_too_long: HOSTNAME_INPUT_TOO_LONG_EXPLANATION,
       not_hostname: 'Ожидался только hostname, не URL, email, порт или credentials.',
       invalid_hostname: 'Строка не является допустимым hostname.',
       invalid_idna: 'Punycode не прошёл проверку декодирования и обратного преобразования.',
